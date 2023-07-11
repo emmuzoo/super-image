@@ -1,5 +1,7 @@
 from .edsr.modeling_edsr import EdsrModel
 from .edsr.configuration_edsr import EdsrConfig
+from .eedsr.modeling_eedsr import EedsrModel
+from .eedsr.configuration_eedsr import EedsrConfig
 from .emdsr.modeling_emdsr import EmdsrModel
 from .emdsr.configuration_emdsr import EmdsrConfig
 from .msrn.modeling_msrn import MsrnModel
