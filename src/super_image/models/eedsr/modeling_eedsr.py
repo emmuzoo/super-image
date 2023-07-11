@@ -117,7 +117,7 @@ class EedsrModel(PreTrainedModel):
             ) for _ in range(n_resblocks)
         ])
         #m_body.append(conv(n_feats, n_feats, kernel_size))
-        self.m_body.add_module(str(n_resblocks), conv(n_feats, n_feats, kernel_size))
+        self.body.add_module(str(n_resblocks), conv(n_feats, n_feats, kernel_size))
 
         #self.head = nn.Sequential(*m_head)
         #self.body = nn.Sequential(*m_body)

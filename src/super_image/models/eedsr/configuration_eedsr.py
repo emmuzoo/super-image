@@ -30,7 +30,7 @@ class EedsrConfig(PretrainedConfig):
 
     def __init__(self, scale: int = None, n_resblocks=16, n_feats=64, n_growths=32, n_colors=3, rgb_range=255,
                  rgb_mean=DIV2K_RGB_MEAN, rgb_std=DIV2K_RGB_STD, no_upsampling=False,
-                 res_scale=1, data_parallel=False, **kwargs):
+                 res_scale=1.0, data_parallel=False, **kwargs):
         """
         Args:
             scale (int): Scale for the model to train an upscaler/super-res model.
