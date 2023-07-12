@@ -107,11 +107,11 @@ class EedsrModel(PreTrainedModel):
         rgb_range = args.rgb_range
         if args.act is None:
             act =  nn.ReLU(True)
-        elif args.act is 'ReLU':
+        elif args.act == 'ReLU':
             act = nn.ReLU(True)
-        elif args.act is 'GeLU':
+        elif args.act == 'GeLU':
             act = nn.GeLU()
-        elif args.act is 'LeakyReLU':
+        elif args.act == 'LeakyReLU':
             act = nn.LeakyReLU()
         else: 
             act =  nn.ReLU(True)
