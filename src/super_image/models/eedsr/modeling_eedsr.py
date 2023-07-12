@@ -4,6 +4,7 @@ import torch.nn as nn
 from .configuration_eedsr import EedsrConfig
 from ...modeling_utils import (
     default_conv,
+    BamBlock,
     MeanShift,
     Upsampler,
     PreTrainedModel
@@ -65,8 +66,8 @@ class ResidualInResidualDenseBlock(nn.Module):
 
 class ResBlock(nn.Module):
     def __init__(
-            self, conv, n_feats, kernel_size,
-            bias=True, bn=False, act=nn.ReLU(True), res_scale=1):
+            self, conv, n_feats, kernel_size, bam=False,
+            bias=True, bn=False, act=nn.ReLU(True), res_scale=0.2):
 
         super(ResBlock, self).__init__()
         m = []
@@ -79,7 +80,9 @@ class ResBlock(nn.Module):
 
         self.body = nn.Sequential(*m)
         self.res_scale = res_scale
-
+        self.bam = bam
+        if bam:
+            self.attention = BamBlock(n_feats)
     def forward(self, x):
         res = self.body(x).mul(self.res_scale)
         res += x
@@ -95,13 +98,20 @@ class EedsrModel(PreTrainedModel):
 
         self.args = args
         n_resblocks = args.n_resblocks
+        bam = args.bam
         n_feats = args.n_feats
         n_growths = args.n_growths
         n_colors = args.n_colors
         kernel_size = 3
         scale = args.scale
         rgb_range = args.rgb_range
-        act = nn.ReLU(True)
+        if act is None:
+            act =  nn.ReLU(True)
+        else:
+            act = args.act
+        #act = nn.ReLU(True)
+        #act = nn.GeLU()
+        #act = nn.LeakyReLU()
         self.sub_mean = MeanShift(rgb_range, rgb_mean=args.rgb_mean, rgb_std=args.rgb_std)  # standardize input
         self.add_mean = MeanShift(rgb_range, sign=1, rgb_mean=args.rgb_mean, rgb_std=args.rgb_std)  # restore output
 
@@ -111,10 +121,10 @@ class EedsrModel(PreTrainedModel):
 
         # define body module, channels: 64->64
         self.body = nn.Sequential(*[
-            #ResBlock(
-            #    conv, n_feats, kernel_size, act=act, res_scale=args.res_scale
-            ResidualInResidualDenseBlock(
-                 n_feats, n_growths, res_scale=args.res_scale
+            ResBlock(
+                conv, n_feats, kernel_size, bam=bam, act=act, res_scale=args.res_scale
+            #ResidualInResidualDenseBlock(
+            #     n_feats, n_growths, res_scale=args.res_scale
             ) for _ in range(n_resblocks)
         ])
         #m_body.append(conv(n_feats, n_feats, kernel_size))
