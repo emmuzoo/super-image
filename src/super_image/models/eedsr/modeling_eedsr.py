@@ -105,7 +105,7 @@ class EedsrModel(PreTrainedModel):
         kernel_size = 3
         scale = args.scale
         rgb_range = args.rgb_range
-        if act is None:
+        if args.act is None:
             act =  nn.ReLU(True)
         else:
             act = args.act
