@@ -59,7 +59,7 @@ class EedsrConfig(PretrainedConfig):
         """
         super().__init__(**kwargs)
         self.scale = scale
-        self.ba = ba
+        self.bn = bn
         self.bam = bam
         self.act = act
         self.n_resblocks = n_resblocks

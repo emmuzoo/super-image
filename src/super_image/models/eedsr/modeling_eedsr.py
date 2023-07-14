@@ -66,7 +66,7 @@ class ResidualInResidualDenseBlock(nn.Module):
 
 class ResBlock(nn.Module):
     def __init__(
-            self, conv, n_feats, kernel_size, ba=None, bam=False,
+            self, conv, n_feats, kernel_size, bam=False,
             bias=True, bn=None, act=nn.ReLU(True), res_scale=0.2):
 
         super(ResBlock, self).__init__()
@@ -120,7 +120,7 @@ class EedsrModel(PreTrainedModel):
         else: 
             act =  nn.ReLU(True)
 
-        ba = args.ba
+        bn = args.bn
         #act = nn.ReLU(True)
         #act = nn.GeLU()
         #act = nn.LeakyReLU()
@@ -134,7 +134,7 @@ class EedsrModel(PreTrainedModel):
         # define body module, channels: 64->64
         self.body = nn.Sequential(*[
             ResBlock(
-                conv, n_feats, kernel_size, ba=ba, bam=bam, act=act, res_scale=args.res_scale
+                conv, n_feats, kernel_size, bn=bn, bam=bam, act=act, res_scale=args.res_scale
             #ResidualInResidualDenseBlock(
             #     n_feats, n_growths, res_scale=args.res_scale
             ) for _ in range(n_resblocks)
