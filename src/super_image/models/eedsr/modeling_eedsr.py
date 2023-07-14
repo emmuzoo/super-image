@@ -67,14 +67,18 @@ class ResidualInResidualDenseBlock(nn.Module):
 class ResBlock(nn.Module):
     def __init__(
             self, conv, n_feats, kernel_size, bam=False,
-            bias=True, bn=False, act=nn.ReLU(True), res_scale=0.2):
+            bias=True, bn=None, act=nn.ReLU(True), res_scale=0.2):
 
         super(ResBlock, self).__init__()
         m = []
         for i in range(2):
             m.append(conv(n_feats, n_feats, kernel_size, bias=bias))
-            if bn:
+            if bn == "batch":
                 m.append(nn.BatchNorm2d(n_feats))
+            elif bn == "instance":
+                nn.InstanceNorm2d(n_feats, affine=True)
+            else:
+                print("None")
             if i == 0:
                 m.append(act)
 
@@ -115,6 +119,8 @@ class EedsrModel(PreTrainedModel):
             act = nn.LeakyReLU()
         else: 
             act =  nn.ReLU(True)
+
+        ba = args.ba
         #act = nn.ReLU(True)
         #act = nn.GeLU()
         #act = nn.LeakyReLU()
@@ -128,7 +134,7 @@ class EedsrModel(PreTrainedModel):
         # define body module, channels: 64->64
         self.body = nn.Sequential(*[
             ResBlock(
-                conv, n_feats, kernel_size, bam=bam, act=act, res_scale=args.res_scale
+                conv, n_feats, kernel_size, ba=ba, bam=bam, act=act, res_scale=args.res_scale
             #ResidualInResidualDenseBlock(
             #     n_feats, n_growths, res_scale=args.res_scale
             ) for _ in range(n_resblocks)

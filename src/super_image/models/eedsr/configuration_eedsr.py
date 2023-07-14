@@ -31,7 +31,7 @@ class EedsrConfig(PretrainedConfig):
     """
     model_type = 'EEDSR'
 
-    def __init__(self, scale: int = None, bam=False, act='ReLU',
+    def __init__(self, scale: int = None, bam=False, act='ReLU', ba=None, 
                  n_resblocks=16, n_feats=64, n_growths=32, n_colors=3, rgb_range=255,
                  rgb_mean=DIV2K_RGB_MEAN, rgb_std=DIV2K_RGB_STD, no_upsampling=False,
                  res_scale=1.0, data_parallel=False, **kwargs):
@@ -59,6 +59,7 @@ class EedsrConfig(PretrainedConfig):
         """
         super().__init__(**kwargs)
         self.scale = scale
+        self.ba = ba
         self.bam = bam
         self.act = act
         self.n_resblocks = n_resblocks
