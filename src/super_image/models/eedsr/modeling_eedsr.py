@@ -66,7 +66,7 @@ class ResidualInResidualDenseBlock(nn.Module):
 
 class ResBlock(nn.Module):
     def __init__(
-            self, conv, n_feats, kernel_size, bam=False,
+            self, conv, n_feats, kernel_size, ba=None, bam=False,
             bias=True, bn=None, act=nn.ReLU(True), res_scale=0.2):
 
         super(ResBlock, self).__init__()
