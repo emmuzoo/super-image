@@ -19,14 +19,14 @@ class DenseResidualBlock(nn.Module):
             growths (int): The number of channels that increase in each layer of convolution.
     """
 
-    def __init__(self, channels: int, growths: int, res_scale=0.2):
+    def __init__(self, channels: int, growths: int, res_scale=0.2, bias=True):
         super(DenseResidualBlock, self).__init__()
         self.res_scale = res_scale
-
+        '''
         def block(in_features, filters, non_linearity=True):
             layers = [nn.Conv2d(in_features, filters, 3, 1, 1, bias=True)]
             if non_linearity:
-                layers += [nn.LeakyReLU()]
+                layers += [nn.LeakyReLU(negative_slope=0.2, inplace=True)]
             return nn.Sequential(*layers)
 
         self.b1 = block(channels + growths * 0, growths)
@@ -35,13 +35,27 @@ class DenseResidualBlock(nn.Module):
         self.b4 = block(channels + growths * 3, growths)
         self.b5 = block(channels + growths * 4, channels, non_linearity=False)
         self.blocks = [self.b1, self.b2, self.b3, self.b4, self.b5]
+        '''
+        self.conv1 = nn.Conv2d(channels, growths, 3, 1, 1, bias=bias)
+        self.conv2 = nn.Conv2d(channels + growths, growths, 3, 1, 1, bias=bias)
+        self.conv3 = nn.Conv2d(channels + 2 * growths, growths, 3, 1, 1, bias=bias)
+        self.conv4 = nn.Conv2d(channels + 3 * growths, growths, 3, 1, 1, bias=bias)
+        self.conv5 = nn.Conv2d(channels + 4 * growths, channels, 3, 1, 1, bias=bias)
+        self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
+        
 
     def forward(self, x):
-        inputs = x
-        for block in self.blocks:
-            out = block(inputs)
-            inputs = torch.cat([inputs, out], 1)
-        return out.mul(self.res_scale) + x
+        #inputs = x
+        #for block in self.blocks:
+        #    out = block(inputs)
+        #    inputs = torch.cat([inputs, out], 1)
+        #return out.mul(self.res_scale) + x
+        x1  = self.lrelu(self.conv1(x))
+        x2  = self.lrelu(self.conv2(torch.cat((x, x1), 1)))
+        x3  = self.lrelu(self.conv3(torch.cat((x, x1, x2), 1)))
+        x4  = self.lrelu(self.conv4(torch.cat((x, x1, x2, x3), 1)))
+        x5 = self.conv5(torch.cat((x, x1, x2, x3, x4), 1))
+        return x5.mul(self.res_scale) + x
 
 
 class ResidualInResidualDenseBlock(nn.Module):
@@ -76,7 +90,7 @@ class ResBlock(nn.Module):
             if bn == "batch":
                 m.append(nn.BatchNorm2d(n_feats))
             elif bn == "instance":
-                nn.InstanceNorm2d(n_feats, affine=True)
+                m.append(nn.InstanceNorm2d(n_feats, affine=True))
             else:
                 print("None")
             if i == 0:
@@ -132,13 +146,20 @@ class EedsrModel(PreTrainedModel):
         self.head = nn.Sequential(*[conv(n_colors, n_feats, kernel_size)])
 
         # define body module, channels: 64->64
-        self.body = nn.Sequential(*[
-            ResBlock(
-                conv, n_feats, kernel_size, bn=bn, bam=bam, act=act, res_scale=args.res_scale
-            #ResidualInResidualDenseBlock(
-            #     n_feats, n_growths, res_scale=args.res_scale
-            ) for _ in range(n_resblocks)
-        ])
+        if args.resblock == "rrdb":
+            self.body = nn.Sequential(*[
+                ResidualInResidualDenseBlock(
+                     n_feats, n_growths, res_scale=args.res_scale
+                ) for _ in range(n_resblocks)
+            ])
+        else:
+            self.body = nn.Sequential(*[
+                ResBlock(
+                    conv, n_feats, kernel_size, bn=bn, bam=bam, act=act, res_scale=args.res_scale
+                #ResidualInResidualDenseBlock(
+                #     n_feats, n_growths, res_scale=args.res_scale
+                ) for _ in range(n_resblocks)
+            ])
         #m_body.append(conv(n_feats, n_feats, kernel_size))
         self.body.add_module(str(n_resblocks), conv(n_feats, n_feats, kernel_size))
 
