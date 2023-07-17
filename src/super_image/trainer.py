@@ -17,6 +17,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import DataLoader
 from torch.optim import lr_scheduler, Adam
+from torch.utils.tensorboard import SummaryWriter
 
 from .modeling_utils import PreTrainedModel
 from .configuration_utils import PretrainedConfig
@@ -100,7 +101,8 @@ class Trainer:
                 Additional keyword arguments used to hide deprecated arguments
         """
         args = self.args
-
+        decay_lr = args.decay_lr
+        logging_dir = args.logging_dir
         epochs_trained = 0
         device = args.device
         num_train_epochs = args.num_train_epochs
@@ -134,13 +136,15 @@ class Trainer:
 
         if args.n_gpu > 1:
             self.model = nn.DataParallel(self.model)
+        #writer = SummaryWriter(log_dir=logging_dir)
 
         optimizer = Adam(self.model.parameters(), lr=learning_rate)
         scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=self.args.gamma)
 
         for epoch in range(epochs_trained, num_train_epochs):
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = learning_rate * (0.1 ** (epoch // int(num_train_epochs * 0.8)))
+            if decay_lr:
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = learning_rate * (0.1 ** (epoch // int(num_train_epochs * 0.8)))
 
             self.model.train()
             epoch_losses = AverageMeter()
@@ -157,6 +161,8 @@ class Trainer:
                     preds = self.model(inputs)
                     criterion = nn.L1Loss()
                     loss = criterion(preds, labels)
+                    # Registra las métricas y pérdidas en SummaryWriter
+                    #writer.add_scalar('Loss/train', loss, epoch)
 
                     epoch_losses.update(loss.item(), len(inputs))
 

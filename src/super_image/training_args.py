@@ -62,7 +62,19 @@ class TrainingArguments:
             )
         },
     )
+    logging_dir: str = field(
+        metadata={"help": "The output directory where the model predictions and checkpoints will be written."},
+    )
     learning_rate: float = field(default=1e-4, metadata={"help": "The initial learning rate for optim.Adam."})
+    decay_lr: bool = field(
+        default=True,
+        metadata={
+            "help": (
+                "Overwrite the content of the output directory."
+                "Use this to continue training if output_dir points to a checkpoint directory."
+            )
+        },
+    )
     gamma: float = field(default=0.5, metadata={"help": "The weight decay gamma to apply to the optim.Adam."})
     num_train_epochs: int = field(default=1000, metadata={"help": "Total number of training epochs to perform."})
     # save_strategy: IntervalStrategy = field(
