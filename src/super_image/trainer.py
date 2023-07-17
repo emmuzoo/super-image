@@ -102,7 +102,7 @@ class Trainer:
         """
         args = self.args
         decay_lr = args.decay_lr
-        logging_dir = args.logging_dir
+        #logging_dir = args.logging_dir
         epochs_trained = 0
         device = args.device
         num_train_epochs = args.num_train_epochs
