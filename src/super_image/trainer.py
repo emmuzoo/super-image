@@ -137,6 +137,7 @@ class Trainer:
         if args.n_gpu > 1:
             self.model = nn.DataParallel(self.model)
         #writer = SummaryWriter(log_dir=logging_dir)
+        print(f"decay_lr: {decay_lr}")
 
         optimizer = Adam(self.model.parameters(), lr=learning_rate)
         scheduler = lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=self.args.gamma)

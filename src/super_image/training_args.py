@@ -62,9 +62,9 @@ class TrainingArguments:
             )
         },
     )
-    logging_dir: str = field(
-        metadata={"help": "The output directory where the model predictions and checkpoints will be written."},
-    )
+    #logging_dir: str = field(
+    #    metadata={"help": "The output directory where the model predictions and checkpoints will be written."},
+    #)
     learning_rate: float = field(default=1e-4, metadata={"help": "The initial learning rate for optim.Adam."})
     decay_lr: bool = field(
         default=True,
