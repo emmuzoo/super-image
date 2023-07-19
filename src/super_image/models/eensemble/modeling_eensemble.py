@@ -21,7 +21,7 @@ class EensembleModel(PreTrainedModel):
     def __init__(self, args, conv=default_conv):
         super(EensembleModel, self).__init__(args)
         self.scale = args.scale
-        n_feats = 9
+        n_feats = 3
         n_colors = 3
         kernel_size = 3
 
