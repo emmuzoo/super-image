@@ -2,6 +2,8 @@ from .edsr.modeling_edsr import EdsrModel
 from .edsr.configuration_edsr import EdsrConfig
 from .ensemble.modeling_ensemble import EnsembleModel
 from .ensemble.configuration_ensemble import EnsembleConfig
+from .eensemble.modeling_eensemble import EensembleModel
+from .eensemble.configuration_eensemble import EensembleConfig
 from .eedsr.modeling_eedsr import EedsrModel
 from .eedsr.configuration_eedsr import EedsrConfig
 from .emdsr.modeling_emdsr import EmdsrModel

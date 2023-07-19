@@ -13,6 +13,7 @@ from .training_args import TrainingArguments
 from .models import (
     EdsrModel, EdsrConfig,
     EmdsrModel, EmdsrConfig,
+    EensembleModel, EensembleConfig, 
     EnsembleModel, EnsembleConfig, 
     EedsrModel, EedsrConfig,
     MsrnModel, MsrnConfig,
@@ -42,6 +43,7 @@ from typing import List
 
 __all__: List[str] = ['TrainingArguments', 'Trainer', 'TrainerDrn',
                       'EdsrModel', 'EdsrConfig',
+                      'EensembleModel', 'EensembleConfig',
                       'EnsembleModel', 'EnsembleConfig',
                       'EedsrModel', 'EedsrConfig',
                       'EmdsrModel', 'EmdsrConfig',
