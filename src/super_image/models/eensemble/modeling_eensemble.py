@@ -44,6 +44,7 @@ class EensembleModel(PreTrainedModel):
         x1 = self.conv1(self.model_msrn(x))
         x2 = self.conv2(self.model_mdrs(x))
         x3 = self.conv3(self.model_edrs_base(x))
-        out = torch.add((x1, x2, x3))
+        out = torch.add(x1, x2)
+        out = torch.add(out, x3)
 
         return out
