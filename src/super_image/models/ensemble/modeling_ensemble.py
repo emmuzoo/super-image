@@ -35,9 +35,8 @@ class EnsembleModel(PreTrainedModel):
         for param in self.model_edrs_base.parameters():
           param.requires_grad = False
         #self.conv = nn.Conv2d(in_channels=9, out_channels=3, kernel_size=3, padding='same')
-        self.tail = nn.Sequential([
-          conv(n_feats, n_colors, kernel_size)
-        ])
+        self.tail = conv(n_feats, n_colors, kernel_size)
+        
 
     def forward(self, x):
         x1 = self.model_msrn(x)
