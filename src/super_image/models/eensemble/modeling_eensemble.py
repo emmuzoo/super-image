@@ -42,15 +42,15 @@ class EensembleModel(PreTrainedModel):
         #self.conv2 = conv(n_feats, n_colors, kernel_size)
         #self.conv3 = conv(n_feats, n_colors, kernel_size)
         
-        self.net1 = nn.Sequential(list(backbone_msrn.children()))
+        self.net1 = nn.Sequential(*list(backbone_msrn.children()))
         self.net1.add_module('conv11', conv(n_feats, n_colors, kernel_size))
         self.net1.add_module('conv12', conv(n_feats, n_colors, kernel_size))
 
-        self.net2 = nn.Sequential(list(backbone_mdrs.children()))
+        self.net2 = nn.Sequential(*list(backbone_mdrs.children()))
         self.net1.add_module('conv21', conv(n_feats, n_colors, kernel_size))
         self.net1.add_module('conv22', conv(n_feats, n_colors, kernel_size))
 
-        self.net3 = nn.Sequential(list(backbone_edrs_base.children()))
+        self.net3 = nn.Sequential(*list(backbone_edrs_base.children()))
         self.net1.add_module('conv31', conv(n_feats, n_colors, kernel_size))
         self.net1.add_module('conv32', conv(n_feats, n_colors, kernel_size))
 
