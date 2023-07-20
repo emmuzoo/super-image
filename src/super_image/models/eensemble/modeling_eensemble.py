@@ -25,23 +25,23 @@ class EensembleModel(PreTrainedModel):
         n_colors = 3
         kernel_size = 3
 
-        backbone_msrn = MsrnModel.from_pretrained('eugenesiow/msrn', scale=self.scale)
-        for param in backbone_msrn.parameters():
+        self.backbone_msrn = MsrnModel.from_pretrained('eugenesiow/msrn', scale=self.scale)
+        for param in self.backbone_msrn.parameters():
           param.requires_grad = False
         
-        backbone_mdrs = MdsrModel.from_pretrained('eugenesiow/mdsr', scale=self.scale)
-        for param in backbone_mdrs.parameters():
+        self.backbone_mdrs = MdsrModel.from_pretrained('eugenesiow/mdsr', scale=self.scale)
+        for param in self.backbone_mdrs.parameters():
           param.requires_grad = False
         
-        backbone_edrs_base = EdsrModel.from_pretrained('eugenesiow/edsr-base', scale=self.scale)
-        for param in backbone_edrs_base.parameters():
+        self.backbone_edrs_base = EdsrModel.from_pretrained('eugenesiow/edsr-base', scale=self.scale)
+        for param in self.backbone_edrs_base.parameters():
           param.requires_grad = False
         
         #self.conv = nn.Conv2d(in_channels=9, out_channels=3, kernel_size=3, padding='same')
         #self.conv1 = conv(n_feats, n_colors, kernel_size)
         #self.conv2 = conv(n_feats, n_colors, kernel_size)
         #self.conv3 = conv(n_feats, n_colors, kernel_size)
-        
+        '''
         self.net1 = nn.Sequential(*list(backbone_msrn.children()))
         self.net1.add_module('conv11', conv(n_feats, n_colors, kernel_size))
         self.net1.add_module('conv12', conv(n_feats, n_colors, kernel_size))
@@ -53,14 +53,29 @@ class EensembleModel(PreTrainedModel):
         self.net3 = nn.Sequential(*list(backbone_edrs_base.children()))
         self.net1.add_module('conv31', conv(n_feats, n_colors, kernel_size))
         self.net1.add_module('conv32', conv(n_feats, n_colors, kernel_size))
+        '''
+        self.fusion1 = nn.Sequential([
+           conv(n_feats, n_colors, kernel_size),
+           conv(n_feats, n_colors, kernel_size)
+        ])
+
+        self.fusion2 = nn.Sequential([
+           conv(n_feats, n_colors, kernel_size),
+           conv(n_feats, n_colors, kernel_size)
+        ])
+
+        self.fusion3 = nn.Sequential([
+           conv(n_feats, n_colors, kernel_size),
+           conv(n_feats, n_colors, kernel_size)
+        ])
 
     def forward(self, x):
         #x1 = self.conv1(self.model_msrn(x))
         #x2 = self.conv2(self.model_mdrs(x))
         #x3 = self.conv3(self.model_edrs_base(x))
-        x1 = self.net1(x)
-        x2 = self.net2(x)
-        x3 = self.net3(x)
+        x1 = self.fusion1(self.backbone_msrn(x))
+        x2 = self.fusion2(self.backbone_mdrs(x))
+        x3 = self.fusion3(self.backbone_edrs_base(x))
         out = torch.add(x1, x2)
         out = torch.add(out, x3)
 
