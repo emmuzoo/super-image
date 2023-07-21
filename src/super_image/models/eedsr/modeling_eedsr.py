@@ -146,22 +146,27 @@ class EedsrModel(PreTrainedModel):
         self.head = nn.Sequential(*[conv(n_colors, n_feats, kernel_size)])
 
         # define body module, channels: 64->64
-        if args.resblock == "rrdb":
-            self.body = nn.Sequential(*[
+        
+        self.rdbbody = nn.Sequential(*[
                 ResidualInResidualDenseBlock(
                      n_feats, n_growths, res_scale=args.res_scale
-                ) for _ in range(n_resblocks)
-            ])
-        else:
-            self.body = nn.Sequential(*[
-                ResBlock(
-                    conv, n_feats, kernel_size, bn=bn, bam=bam, act=act, res_scale=args.res_scale
-                #ResidualInResidualDenseBlock(
-                #     n_feats, n_growths, res_scale=args.res_scale
-                ) for _ in range(n_resblocks)
-            ])
+                ) for _ in range(8)
+        ])
+
+
+        self.resbody = nn.Sequential(*[
+            ResBlock(
+                conv, n_feats, kernel_size, bn=bn, bam=bam, act=act, res_scale=args.res_scale
+            #ResidualInResidualDenseBlock(
+            #     n_feats, n_growths, res_scale=args.res_scale
+            ) for _ in range(n_resblocks)
+        ])
         #m_body.append(conv(n_feats, n_feats, kernel_size))
-        self.body.add_module(str(n_resblocks), conv(n_feats, n_feats, kernel_size))
+        #self.body.add_module(str(n_resblocks), conv(n_feats, n_feats, kernel_size))
+
+        self.conv = conv(n_feats*2, n_feats, kernel_size)
+
+
 
         #self.head = nn.Sequential(*m_head)
         #self.body = nn.Sequential(*m_body)
@@ -180,7 +185,11 @@ class EedsrModel(PreTrainedModel):
     def forward(self, x):
         x = self.head(x)
 
-        res = self.body(x)
+        #res = self.body(x)
+        rdb = self.rdbbody(x)
+        res = self.resbody(x)
+        res = torch.cat((rdb, res), dim=1)
+        
         res += x
 
         if self.args.no_upsampling:
