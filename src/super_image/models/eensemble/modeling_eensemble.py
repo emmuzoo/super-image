@@ -54,17 +54,17 @@ class EensembleModel(PreTrainedModel):
         self.net1.add_module('conv31', conv(n_feats, n_colors, kernel_size))
         self.net1.add_module('conv32', conv(n_feats, n_colors, kernel_size))
         '''
-        self.fusion1 = nn.Sequential([
+        self.fusion1 = nn.Sequential(*[
            conv(n_feats, n_colors, kernel_size),
            conv(n_feats, n_colors, kernel_size)
         ])
 
-        self.fusion2 = nn.Sequential([
+        self.fusion2 = nn.Sequential(*[
            conv(n_feats, n_colors, kernel_size),
            conv(n_feats, n_colors, kernel_size)
         ])
 
-        self.fusion3 = nn.Sequential([
+        self.fusion3 = nn.Sequential(*[
            conv(n_feats, n_colors, kernel_size),
            conv(n_feats, n_colors, kernel_size)
         ])
