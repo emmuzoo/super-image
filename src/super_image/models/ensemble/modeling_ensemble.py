@@ -41,7 +41,7 @@ class EnsembleModel(PreTrainedModel):
            #nn.InstanceNorm2d(n_feats, affine=True),
            conv(n_colors, n_colors, kernel_size),
            #nn.InstanceNorm2d(n_feats, affine=True),
-           conv(n_colors, n_colors, 2),
+           conv(n_colors, n_colors, kernel_size),
            #nn.InstanceNorm2d(n_feats, affine=True)
         ])
         
