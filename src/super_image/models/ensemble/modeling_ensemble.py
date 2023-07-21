@@ -38,11 +38,11 @@ class EnsembleModel(PreTrainedModel):
         #self.tail = conv(n_feats, n_colors, kernel_size)
         self.tail = nn.Sequential(*[
            conv(n_feats, n_colors, kernel_size),
-           nn.InstanceNorm2d(n_feats, affine=True),
+           #nn.InstanceNorm2d(n_feats, affine=True),
            conv(n_feats, n_colors, kernel_size),
-           nn.InstanceNorm2d(n_feats, affine=True),
+           #nn.InstanceNorm2d(n_feats, affine=True),
            conv(n_feats, n_colors, 2),
-           nn.InstanceNorm2d(n_feats, affine=True)
+           #nn.InstanceNorm2d(n_feats, affine=True)
         ])
         
 
