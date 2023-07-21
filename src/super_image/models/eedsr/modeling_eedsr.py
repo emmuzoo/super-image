@@ -189,7 +189,7 @@ class EedsrModel(PreTrainedModel):
         rdb = self.rdbbody(x)
         res = self.resbody(x)
         res = torch.cat((rdb, res), dim=1)
-        
+        res = self.conv(res)
         res += x
 
         if self.args.no_upsampling:
