@@ -91,8 +91,7 @@ class ResBlock(nn.Module):
                 m.append(nn.BatchNorm2d(n_feats))
             elif bn == "instance":
                 m.append(nn.InstanceNorm2d(n_feats, affine=True))
-            else:
-                print("None")
+            
             if i == 0:
                 m.append(act)
 
