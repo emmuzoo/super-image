@@ -163,7 +163,10 @@ class EedsrModel(PreTrainedModel):
         #m_body.append(conv(n_feats, n_feats, kernel_size))
         #self.body.add_module(str(n_resblocks), conv(n_feats, n_feats, kernel_size))
 
-        self.conv = conv(n_feats*2, n_feats, kernel_size)
+        if self.args.no_add:
+            self.conv = conv(n_feats*2, n_feats, kernel_size)
+        else:
+            self.conv = conv(n_feats, n_feats, kernel_size)
 
 
 
