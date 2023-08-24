@@ -6,6 +6,8 @@ from .eensemble.modeling_eensemble import EensembleModel
 from .eensemble.configuration_eensemble import EensembleConfig
 from .eedsr.modeling_eedsr import EedsrModel
 from .eedsr.configuration_eedsr import EedsrConfig
+from .edsrffc.modeling_edsrffc import EdsrffcModel
+from .edsrffc.configuration_edsrffc import EdsrffcConfig
 from .emdsr.modeling_emdsr import EmdsrModel
 from .emdsr.configuration_emdsr import EmdsrConfig
 from .msrn.modeling_msrn import MsrnModel
