@@ -9,6 +9,8 @@ from ...modeling_utils import (
     PreTrainedModel
 )
 
+
+
 class SpatialTransform(nn.Module):
     def __init__(self, 
                  in_channels: int, 
@@ -110,12 +112,14 @@ class FrequencyTrasform(nn.Module):
 class SFB(nn.Module):
     def __init__(self, 
                  in_channels: int, 
-                 out_channels: int, 
+                 out_channels: int,
+                 kernel_size: int = 3, 
                  bias: bool = False):
         super(SFB, self).__init__()
         
         self.spatial = SpatialTransform(in_channels, 
                                         out_channels, 
+                                        kernel_size=kernel_size,
                                         bias=bias)
         
         self.frequency = FrequencyTrasform(in_channels, 
@@ -137,15 +141,22 @@ class SFB(nn.Module):
         return output 
     
 
-class ResBlock(nn.Module):
-    def __init__(
-            self, conv, n_feats, kernel_size,
-            bias=True, bn=False, act=nn.ReLU(True), res_scale=1):
 
-        super(ResBlock, self).__init__()
+
+class FFCResBlock(nn.Module):
+    def __init__(
+            self, 
+            n_feats, 
+            kernel_size,
+            bias=True, 
+            bn=False, 
+            act=nn.ReLU(True), 
+            res_scale=1):
+
+        super(FFCResBlock, self).__init__()
         m = []
         for i in range(2):
-            m.append(conv(n_feats, n_feats, kernel_size, bias=bias))
+            m.append(SFB(n_feats, n_feats, kernel_size, bias=bias))
             if bn:
                 m.append(nn.BatchNorm2d(n_feats))
             if i == 0:
@@ -183,11 +194,11 @@ class EdsrffcModel(PreTrainedModel):
 
         # define body module, channels: 64->64
         m_body = [
-            ResBlock(
-                conv, n_feats, kernel_size, act=act, res_scale=args.res_scale
+            FFCResBlock(
+                n_feats, kernel_size, act=act, res_scale=args.res_scale
             ) for _ in range(n_resblocks)
         ]
-        m_body.append(conv(n_feats, n_feats, kernel_size))
+        m_body.append(SFB(n_feats, n_feats, kernel_size))
 
         self.head = nn.Sequential(*m_head)
         self.body = nn.Sequential(*m_body)
