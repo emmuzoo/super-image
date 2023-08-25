@@ -30,7 +30,7 @@ class EdsrffcConfig(PretrainedConfig):
 
     def __init__(self, scale: int = None, n_resblocks=16, n_feats=64, n_colors=3, rgb_range=255,
                  rgb_mean=DIV2K_RGB_MEAN, rgb_std=DIV2K_RGB_STD, no_upsampling=False, no_replace_resconv = False,
-                 res_scale=1, act='ReLU',
+                 res_scale=0.1, act='ReLU', bias=True,
                  data_parallel=False, **kwargs):
         """
         Args:
@@ -41,7 +41,7 @@ class EdsrffcConfig(PretrainedConfig):
                 Number of color channels.
             rgb_range (int):
                 Range of RGB as a multiplier to the MeanShift.
-            res_scale (int):
+            res_scale (float):
                 The res scale multiplier.
             rgb_mean (tuple):
                 The RGB mean of the train dataset.
@@ -67,3 +67,4 @@ class EdsrffcConfig(PretrainedConfig):
         self.data_parallel = data_parallel
         self.no_replace_resconv = no_replace_resconv
         self.act = act
+        self.bias = bias

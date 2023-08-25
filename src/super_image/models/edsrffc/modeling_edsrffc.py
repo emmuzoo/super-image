@@ -173,7 +173,7 @@ class FFCResBlock(nn.Module):
             print("NO REPLACE RESCONV: SFB-RELU-SFB")
             m = []
             for i in range(2):
-                m.append(SFB(n_feats, n_feats, kernel_size, bias=bias))
+                m.append(SFB(n_feats, n_feats, kernel_size=kernel_size, act=act, bias=bias))
                 if bn:
                     m.append(nn.BatchNorm2d(n_feats))
                 if i == 0:
@@ -182,7 +182,7 @@ class FFCResBlock(nn.Module):
             self.body = nn.Sequential(*m)
         else:
             print("REPLACE RESCONV: SFB")
-            self.body = SFB(n_feats, n_feats, kernel_size, bias=bias)
+            self.body = SFB(n_feats, n_feats, kernel_size=kernel_size, act=act, bias=bias)
         
         self.res_scale = res_scale
 
@@ -205,8 +205,10 @@ class EdsrffcModel(PreTrainedModel):
         n_colors = args.n_colors
         kernel_size = 3
         scale = args.scale
+        res_scale = args.res_scale
         rgb_range = args.rgb_range
         no_replace_resconv = args.no_replace_resconv
+        bias = args.bias
         #act = nn.ReLU(True)
         print(f"act={args.act}")
         if args.act is None:
@@ -229,10 +231,10 @@ class EdsrffcModel(PreTrainedModel):
         # define body module, channels: 64->64
         m_body = [
             FFCResBlock(
-                n_feats, kernel_size, act=act, res_scale=args.res_scale, no_replace_resconv=no_replace_resconv
+                n_feats, kernel_size, act=act, res_scale=res_scale, bias=bias, no_replace_resconv=no_replace_resconv
             ) for _ in range(n_resblocks)
         ]
-        m_body.append(SFB(n_feats, n_feats, kernel_size))
+        m_body.append(SFB(n_feats, n_feats, kernel_size=kernel_size, act=act, bias=bias))
 
         self.head = nn.Sequential(*m_head)
         self.body = nn.Sequential(*m_body)
