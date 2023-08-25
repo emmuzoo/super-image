@@ -29,7 +29,7 @@ class EdsrConfig(PretrainedConfig):
     model_type = 'EDSRFFC'
 
     def __init__(self, scale: int = None, n_resblocks=16, n_feats=64, n_colors=3, rgb_range=255,
-                 rgb_mean=DIV2K_RGB_MEAN, rgb_std=DIV2K_RGB_STD, no_upsampling=False, no_replace_conv = False,
+                 rgb_mean=DIV2K_RGB_MEAN, rgb_std=DIV2K_RGB_STD, no_upsampling=False, no_replace_resconv = False,
                  res_scale=1, data_parallel=False, **kwargs):
         """
         Args:
@@ -64,4 +64,4 @@ class EdsrConfig(PretrainedConfig):
         self.rgb_std = rgb_std
         self.no_upsampling = no_upsampling
         self.data_parallel = data_parallel
-        self.no_replace_conv = no_replace_conv
+        self.no_replace_resconv = no_replace_resconv

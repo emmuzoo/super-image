@@ -158,16 +158,13 @@ class FFCResBlock(nn.Module):
             kernel_size,
             bias=True, 
             bn=False, 
-            no_replace_conv=False,
+            no_replace_resconv=False,
             act=nn.ReLU(True), 
             res_scale=1):
 
         super(FFCResBlock, self).__init__()
-        if no_replace_conv:
-            print("NO REPLACE CONV: SFB")
-            self.body = SFB(n_feats, n_feats, kernel_size, bias=bias)
-        else:
-            print("REPLACE CONV: SFB-RELU-SFB")
+        if no_replace_resconv:
+            print("NO REPLACE RESCONV: SFB-RELU-SFB")
             m = []
             for i in range(2):
                 m.append(SFB(n_feats, n_feats, kernel_size, bias=bias))
@@ -177,6 +174,9 @@ class FFCResBlock(nn.Module):
                     m.append(act)
 
             self.body = nn.Sequential(*m)
+        else:
+            print("REPLACE RESCONV: SFB")
+            self.body = SFB(n_feats, n_feats, kernel_size, bias=bias)
         
         self.res_scale = res_scale
 
@@ -200,6 +200,7 @@ class EdsrffcModel(PreTrainedModel):
         kernel_size = 3
         scale = args.scale
         rgb_range = args.rgb_range
+        no_replace_resconv = args.no_replace_resconv
         act = nn.ReLU(True)
         self.sub_mean = MeanShift(rgb_range, rgb_mean=args.rgb_mean, rgb_std=args.rgb_std)  # standardize input
         self.add_mean = MeanShift(rgb_range, sign=1, rgb_mean=args.rgb_mean, rgb_std=args.rgb_std)  # restore output
@@ -210,7 +211,7 @@ class EdsrffcModel(PreTrainedModel):
         # define body module, channels: 64->64
         m_body = [
             FFCResBlock(
-                n_feats, kernel_size, act=act, res_scale=args.res_scale, no_replace_conv=no_replace_conv
+                n_feats, kernel_size, act=act, res_scale=args.res_scale, no_replace_resconv=no_replace_resconv
             ) for _ in range(n_resblocks)
         ]
         m_body.append(SFB(n_feats, n_feats, kernel_size))
