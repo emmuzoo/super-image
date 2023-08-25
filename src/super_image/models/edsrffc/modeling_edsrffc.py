@@ -208,6 +208,7 @@ class EdsrffcModel(PreTrainedModel):
         rgb_range = args.rgb_range
         no_replace_resconv = args.no_replace_resconv
         #act = nn.ReLU(True)
+        print(f"act={args.act}")
         if args.act is None:
             act =  nn.ReLU(True)
         elif args.act == 'ReLU':
