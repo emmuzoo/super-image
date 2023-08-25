@@ -5,7 +5,7 @@ from ...data.datasets import (
 )
 
 
-class EdsrConfig(PretrainedConfig):
+class EdsrffcConfig(PretrainedConfig):
     """
     This is the configuration class to store the configuration of a :class:`~super_image.EdsrModel`.
     It is used to instantiate the model according to the specified arguments, defining the model architecture.
