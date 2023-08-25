@@ -30,7 +30,8 @@ class EdsrffcConfig(PretrainedConfig):
 
     def __init__(self, scale: int = None, n_resblocks=16, n_feats=64, n_colors=3, rgb_range=255,
                  rgb_mean=DIV2K_RGB_MEAN, rgb_std=DIV2K_RGB_STD, no_upsampling=False, no_replace_resconv = False,
-                 res_scale=1, data_parallel=False, **kwargs):
+                 res_scale=1, act='ReLU',
+                 data_parallel=False, **kwargs):
         """
         Args:
             scale (int): Scale for the model to train an upscaler/super-res model.
@@ -65,3 +66,4 @@ class EdsrffcConfig(PretrainedConfig):
         self.no_upsampling = no_upsampling
         self.data_parallel = data_parallel
         self.no_replace_resconv = no_replace_resconv
+        self.act = act

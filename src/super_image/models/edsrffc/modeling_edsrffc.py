@@ -44,6 +44,7 @@ class FourierUnit(nn.Module):
     def __init__(self, 
                  in_channels: int, 
                  out_channels: int,
+                 act: nn.LeakyReLU(negative_slope=0.2, inplace=True),
                  groups: int=1,
                  fft_norm='ortho'):
         super(FourierUnit, self).__init__()
@@ -54,7 +55,7 @@ class FourierUnit(nn.Module):
                       groups=groups,
                       padding=0, 
                       bias=False)  # 3x3 convolution
-        self.relu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
+        self.relu = act
         self.fft_norm = fft_norm
 
     def forward(self, x):
@@ -90,6 +91,7 @@ class FrequencyTrasform(nn.Module):
                  in_channels: int, 
                  out_channels: int, 
                  groups: int = 1,
+                 act = nn.LeakyReLU(negative_slope=0.2, inplace=True),
                  bias: bool = False):
         super(FrequencyTrasform, self).__init__()
         
@@ -99,11 +101,12 @@ class FrequencyTrasform(nn.Module):
                       kernel_size=1, 
                       groups=groups, 
                       bias=bias),
-            nn.LeakyReLU(negative_slope=0.2, inplace=True) 
+            act
         )
 
         self.fu = FourierUnit(out_channels // 2, 
-                              out_channels // 2,
+                              out_channels // 2, 
+                              act = act, 
                               groups = groups)
         
         self.conv2 = nn.Conv2d(out_channels // 2, out_channels, kernel_size=1, bias=bias)  # 1x1 convolution nf->nf
@@ -122,16 +125,19 @@ class SFB(nn.Module):
                  in_channels: int, 
                  out_channels: int,
                  kernel_size: int = 3, 
+                 act = nn.LeakyReLU(negative_slope=0.2, inplace=True),
                  bias: bool = False):
         super(SFB, self).__init__()
         
         self.spatial = SpatialTransform(in_channels, 
                                         out_channels, 
-                                        kernel_size=kernel_size,
+                                        kernel_size=kernel_size, 
+                                        act=act, 
                                         bias=bias)
         
         self.frequency = FrequencyTrasform(in_channels, 
                                            out_channels, 
+                                           act=act, 
                                            bias=bias)
 
         self.conv1 = nn.Conv2d(out_channels * 2, 
@@ -201,7 +207,18 @@ class EdsrffcModel(PreTrainedModel):
         scale = args.scale
         rgb_range = args.rgb_range
         no_replace_resconv = args.no_replace_resconv
-        act = nn.ReLU(True)
+        #act = nn.ReLU(True)
+        if args.act is None:
+            act =  nn.ReLU(True)
+        elif args.act == 'ReLU':
+            act = nn.ReLU(True)
+        elif args.act == 'GeLU':
+            act = nn.GeLU()
+        elif args.act == 'LeakyReLU':
+            act = nn.LeakyReLU()
+        else: 
+            act =  nn.ReLU(True)
+
         self.sub_mean = MeanShift(rgb_range, rgb_mean=args.rgb_mean, rgb_std=args.rgb_std)  # standardize input
         self.add_mean = MeanShift(rgb_range, sign=1, rgb_mean=args.rgb_mean, rgb_std=args.rgb_std)  # restore output
 
