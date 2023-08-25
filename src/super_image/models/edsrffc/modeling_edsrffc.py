@@ -17,6 +17,7 @@ class SpatialTransform(nn.Module):
                  in_channels: int, 
                  out_channels: int,
                  kernel_size: int = 3, 
+                 act = nn.LeakyReLU(negative_slope=0.2, inplace=True), 
                  bias: bool = False):
         super(SpatialTransform, self).__init__()
 
@@ -26,7 +27,7 @@ class SpatialTransform(nn.Module):
                       kernel_size=kernel_size, 
                       padding=(kernel_size - 1) // 2, 
                       bias=bias),  # 3x3 convolution
-            nn.LeakyReLU(negative_slope=0.2, inplace=True), 
+            act, 
             nn.Conv2d(out_channels, 
                       out_channels, 
                       kernel_size=kernel_size, 
