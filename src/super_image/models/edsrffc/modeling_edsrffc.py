@@ -158,19 +158,24 @@ class FFCResBlock(nn.Module):
             kernel_size,
             bias=True, 
             bn=False, 
+            no_replace_conv=False,
             act=nn.ReLU(True), 
             res_scale=1):
 
         super(FFCResBlock, self).__init__()
-        m = []
-        for i in range(2):
-            m.append(SFB(n_feats, n_feats, kernel_size, bias=bias))
-            if bn:
-                m.append(nn.BatchNorm2d(n_feats))
-            if i == 0:
-                m.append(act)
+        if no_replace_conv:
+            m = []
+            for i in range(2):
+                m.append(SFB(n_feats, n_feats, kernel_size, bias=bias))
+                if bn:
+                    m.append(nn.BatchNorm2d(n_feats))
+                if i == 0:
+                    m.append(act)
 
-        self.body = nn.Sequential(*m)
+            self.body = nn.Sequential(*m)
+        else:
+            self.body = SFB(n_feats, n_feats, kernel_size, bias=bias)
+
         self.res_scale = res_scale
 
     def forward(self, x):
@@ -203,7 +208,7 @@ class EdsrffcModel(PreTrainedModel):
         # define body module, channels: 64->64
         m_body = [
             FFCResBlock(
-                n_feats, kernel_size, act=act, res_scale=args.res_scale
+                n_feats, kernel_size, act=act, res_scale=args.res_scale, no_replace_conv=no_replace_conv
             ) for _ in range(n_resblocks)
         ]
         m_body.append(SFB(n_feats, n_feats, kernel_size))
