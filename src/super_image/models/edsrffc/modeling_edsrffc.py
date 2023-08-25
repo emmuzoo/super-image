@@ -164,6 +164,10 @@ class FFCResBlock(nn.Module):
 
         super(FFCResBlock, self).__init__()
         if no_replace_conv:
+            print("NO REPLACE CONV: SFB")
+            self.body = SFB(n_feats, n_feats, kernel_size, bias=bias)
+        else:
+            print("REPLACE CONV: SFB-RELU-SFB")
             m = []
             for i in range(2):
                 m.append(SFB(n_feats, n_feats, kernel_size, bias=bias))
@@ -173,9 +177,7 @@ class FFCResBlock(nn.Module):
                     m.append(act)
 
             self.body = nn.Sequential(*m)
-        else:
-            self.body = SFB(n_feats, n_feats, kernel_size, bias=bias)
-
+        
         self.res_scale = res_scale
 
     def forward(self, x):
