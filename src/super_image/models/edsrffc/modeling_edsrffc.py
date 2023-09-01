@@ -219,7 +219,7 @@ class EdsrffcModel(PreTrainedModel):
         elif args.act == 'GeLU':
             act = nn.GeLU()
         elif args.act == 'LeakyReLU':
-            act = nn.LeakyReLU()
+            act = nn.LeakyReLU(negative_slope=0.2, inplace=True)
         else: 
             act =  nn.ReLU(True)
 
